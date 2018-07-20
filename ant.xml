@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<project name="deployToDep" default="deploy">
+	<property file="./ant.properties" />
+
+    <taskdef resource="net/sf/antcontrib/antlib.xml" classpath="${ant.contrib}" />
+	
+	<target name="minify">
+	    <java jar="${yui.compressor}" fork="true" dir="./themes/spa/js">
+	        <arg value="caviar.js" /> <!-- input path for JS files -->
+	        <arg value="-v" /> <!-- Turn on verbose -->
+	        <arg value="-o" />
+	        <arg value="caviar.min.js" /> <!-- output path for JS files -->
+	    	<arg value="--charset" />
+	    	<arg value="utf-8" />
+	        <classpath>
+	            <pathelement location="${yui.compressor}"/>
+	        </classpath>
+	    </java>		
+	</target>
+	
+	<target name="deploy">
+		<for list="${deploy}" delimiter="," param="path">
+			<sequential>
+				<copy overwrite="true" todir="@{path}" file="caviar.min.js" />
+			</sequential>
+		</for>
+	</target>
+</project>

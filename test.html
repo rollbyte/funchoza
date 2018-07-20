@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Caviar test</title>
+</head>
+<body>
+<style>
+
+span.danger {
+	color:red;
+}
+
+span.calm {
+	color: green;
+}
+
+table.danger {
+	background-color:red;
+}
+
+table.calm {
+	background-color: green;
+}
+
+tr.current {
+	background-color:navy;
+	color:white;
+}
+
+
+.blink {
+	border-style:none;
+}
+
+.bordered {
+	border-style:solid;
+	border-width:2px;
+	border-color:navy;
+}
+
+</style>
+
+<script type="text/javascript" src="jquery-min.js"></script>
+<script type="text/javascript" src="caviar.js"></script>
+<script type="text/javascript">
+	var test = {
+		current:null,
+		isCurrent:function(el){
+			return el === this.current;
+		},
+		select:function(el){
+			this.current = el;
+		},
+		attr2:{
+			type:"Собчак",
+			name:"Нунчак"
+		},
+		attr3:{
+			title:"Перспективы борьбы с гомофобией в Хабаровском крае",
+			type:"доклад",
+			contents:"авотхуй",
+			subelement:{a:"лытдыбр", b:"дыбрлыт"},
+			getSub:function(){
+				return this.subelement;
+			},
+			action2:function(){
+				this.title = "Перспективы борьбы с борьбой с гомофобией в Хабаровском крае";
+				this.type = "доклад";
+				this.contents = "нухуйевознаит";
+			},
+			editTitle:function(element){
+				this.title = element.val();
+			}
+		},
+		getAttr3:function(){
+			return this.attr3;
+		},
+		attr1:function(){
+			return this.attr2.type+": "+this.attr2.name;
+		},
+		colsize:function(){
+			return this.collection.length;
+		},
+		summary:function(){
+			var r = "";
+			for (var i = 0; i < this.collection.length; i++)
+				r = r + this.collection[i].a + ", ";
+			return r;
+		},
+		calm:function(){
+			return this.collection.length > 5;
+		},
+		danger:function(){
+			return this.collection.length < 2;
+		},
+		indicator:function(){
+			var s = this.collection.length;
+			var redfraction = (s > 5)?0:((5-s)*255/5);
+			var greenfraction = (s < 5)?0:((s > 15)?255:(s*255/10));
+			return "rgb("+redfraction+", "+greenfraction+", 0)";
+		},
+		collection:[
+		   {a:"troll", b:"elll",c:{time:1, capacity:0}}, {a:"mock", b:"stock",c:{time:2, capacity:4}}
+		],
+		action1:function(){
+			test.attr3 = null;
+		},		
+		action3:function(){
+			this.collection[this.collection.length] = {
+					a:"qqqqq",b:"qqqq",c:{time:67, capacity:40}
+			};
+		},
+		action4:function(callback){
+			this.collection.unshift({
+				a:"aaaa",b:"bbb",c:{time:7, capacity:9}
+			});
+		},
+		action5:function(){
+			this.collection.shift();
+		}
+	};
+	
+	function inputSize(v){
+		if (v.length < 10)
+			return "50px";
+		if (v.length < 20)
+			return "100px";
+		if (v.length < 50)
+			return "300px";
+		return "500px";
+	}
+	
+	function test2(){
+		return "thats my " + test.attr1() + " girl";
+	}
+</script>
+<div cvr-scope="test">
+	<div>
+		<button cvr-scope="attr3" cvr-handlers="click:$.test.action1">Ебануть1</button>
+		<button cvr-handlers="click:action3">Ебануть3</button>
+		<button cvr-handlers="click:action4">Ебануть4</button>
+		<button cvr-handlers="click:action5">Ебануть5</button>	
+	</div>
+	<div cvr-scope="attr2" style="background-color:silver;">
+		<input type="text" cvr-data="type" /><br/>
+		<input type="text" cvr-data="name" /><br/>
+		<div cvr-scope="$.test" cvr-data="attr1"></div>
+	</div>
+	<div>В коллекции <span cvr-data="colsize" cvr-classes="danger:danger;calm:calm"></span> элементов</div>
+	<div>Сводка: <span cvr-data="summary" cvr-style="color:indicator"></span></div>
+	<table cvr-classes="danger:danger;calm:calm">
+		<tbody cvr-scope="collection" cvr-foreach cvr-watch-parent="true">
+			<tr cvr-handlers="click:$.test.select(@scope)" cvr-classes="current:$.test.isCurrent(@scope)">
+				<td><input type="text" cvr-data="a" /></td>
+				<td cvr-data="b"></td>
+				<td cvr-scope="c">
+					<span cvr-data="time"></span>:<span cvr-data="capacity"></span>
+				</td>
+			</tr>
+		</tbody>
+	</table>
+	<div cvr-scope="attr3" style="background-color:silver;">
+		<input type="text" cvr-bind="read" cvr-data="title" cvr-handlers="keydown:editTitle" cvr-style="width:$.inputSize(title)" /><br/>
+		<input type="text" class="blink" cvr-data="type" /><br/>
+		<input type="text" cvr-data="contents" /><br/>
+		<button cvr-handlers="click:action2">Ебануть2</button>
+	</div>	
+	<div>
+		<input type="text" cvr-scope="getAttr3().getSub()" cvr-data="a" /><br/>
+		<input type="text" cvr-scope="getAttr3().getSub()" cvr-data="b" /><br/>
+		<span cvr-scope="getAttr3().getSub()" cvr-bind="read" cvr-data="a"></span>
+		<span cvr-scope="getAttr3().getSub()" cvr-bind="read" cvr-data="b"></span>
+	</div>
+	<div cvr-data="attr3.title"></div>
+</div>
+<div cvr-data="test2"></div>
+
+<script type="text/javascript">
+
+$(".blink").bind("caviar-invalidate",function(e){
+	var el = $(e.target);
+	el.toggleClass("bordered");
+});
+
+</script>
+
+</body>
+</html>

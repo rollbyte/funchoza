@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Caviar test</title>
+</head>
+<body>
+<style>
+
+tr.current {
+	background-color:navy;
+	color:white;
+}
+
+</style>
+
+<script type="text/javascript" src="jquery-min.js"></script>
+<script type="text/javascript" src="caviar.js"></script>
+<script type="text/javascript">
+
+	function Task(text){
+		this.text = text;
+		this.select = function(){
+			todo.current = this;
+		};
+		this.isCurrent = function(){
+			return todo.current === this;
+		};
+	}
+
+	var todo = {
+		current:null,
+
+		taskList:[],
+				
+		addTask:function(element){
+			var t = new Task(element.prev().val());
+			element.prev().val("");
+			this.taskList[this.taskList.length] = t;
+		},
+		
+		done:function(){
+			this.taskList.splice(this.taskList.indexOf(this.current),1);
+			delete this.current;
+		},
+				
+		tasksCount:function(){
+			return this.taskList.length;
+		}
+	};
+</script>
+<div cvr-scope="todo">
+	<div>
+		<input type="text" value="" /><button cvr-handlers="click:addTask">Добавить</button>
+	</div>
+	<div>У вас <span cvr-data="tasksCount"></span> задач</div>
+	<table>
+		<tbody cvr-scope="taskList" cvr-foreach cvr-watch-parent="true">
+			<tr cvr-handlers="click:select" cvr-classes="current:isCurrent">
+				<td cvr-data="text" /></td>
+			</tr>
+		</tbody>
+	</table>
+	<button cvr-handlers="click:done">Готово!</button>
+</div>
+</body>
+</html>
