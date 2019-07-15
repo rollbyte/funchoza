@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Funchoza test</title>
+<style>
+.current {
+	background-color: navy;
+	color: white;
+}
+
+.task {
+	cursor: pointer;
+	padding: 4px;
+	border-bottom: solid 1px silver;
+}
+
+.subs {
+	margin-left: 15px;
+}
+</style>
+</head>
+<body>
+	<script type="text/javascript" src="../components/jquery/jquery.min.js"></script>
+	<script type="text/javascript" src="../funchoza.js"></script>
+	<script type="text/javascript">
+		function Task(text) {
+			this.text = text;
+
+			this.subTasks = [];
+
+			this.parent = null;
+			
+			this.done = false;
+			
+			this.selected = false;
+			
+			this.setDone = function (cb) {
+				this.done = true;
+				if (typeof cb === 'function') {
+					cb();
+				}
+				for (var i = 0; i < this.subTasks.length; i++) {
+					this.subTasks[i].setDone(cb);
+				}
+			};
+		}
+
+		var todo = {
+			current: null,
+
+			mode: 'none',
+
+			taskList: [],
+			
+			tasksCount: 0,
+			
+			fulFilled: [],
+			
+			newTask: new Task(''),
+
+			addTask: function() {
+				if (this.current) {
+					this.newTask.parent = this.current;
+					this.current.subTasks.push(this.newTask);
+				} else
+					this.taskList.push(this.newTask);
+				this.tasksCount++;
+				this.newTask = new Task('');
+			},
+			
+			select: function(t) {
+				if (!t.done) {
+					if (this.current === t) {
+						this.current.selected = false;
+						this.current = null;
+					} else {
+						if (this.current)
+							this.current.selected = false;
+						this.current = t;
+						this.current.selected = true;
+					}
+				}
+			},
+
+			done : function() {
+				if (this.current) {
+					if (this.current.parent) {
+						this.current.parent.subTasks.splice(
+								this.current.parent.subTasks.indexOf(this.current),
+								1
+						);
+						this.current.parent = null;
+					} else
+						this.taskList
+							.splice(this.taskList.indexOf(this.current), 1);
+					this.current.setDone((function () {
+						this.tasksCount--;
+					}).bind(this));
+					this.current.selected = false;
+					this.fulFilled.push(this.current);
+				}
+			},
+			
+			del : function(t) {
+				if (t.done) {
+					var ind = this.fulFilled.indexOf(t);
+					if (ind >= 0) {
+						this.fulFilled.splice(ind, 1);
+					} else if (t.parent) {
+						ind = t.parent.subTasks.indexOf(t);
+						if (ind >= 0) {
+							t.parent.subTasks.splice(ind, 1);
+						}
+					}
+				}
+			}
+		};
+	</script>
+	<div fz-scope="todo">
+		<div>
+			<input type="text" fz-data="newTask.text" />
+			<button fz-handlers="click:addTask">Add</button>
+		</div>
+		<div>
+			You have <span fz-data="tasksCount"></span> tasks
+		</div>
+		<div fz-foreach="taskList" fz-watch-children="true">
+			<div fz-tpl="todo3task" fz-watch-children="true"></div>
+		</div>
+		<button fz-handlers="click:done">Done!</button>
+		<h4>Fulfilled</h4>
+		<div fz-foreach="fulFilled" fz-watch-children="true">
+			<div fz-tpl="todo3task" fz-watch-children="true"></div>
+		</div>		
+	</div>
+	<template id="todo3task">
+	<div>
+		<div class="task" fz-handlers="click:$.todo.select(@scope)" fz-classes="current:selected">
+			<span fz-data="text"></span>
+			<button fz-if="done" fz-handlers="click:$.todo.del(@scope)">Delete</button>
+		</div>
+		<div fz-foreach="subTasks" fz-watch-children="true" class="subs">
+			<div fz-tpl="todo3task" fz-watch-children="true"></div>
+		</div>
+	</div>
+	</template>
+</body>
+</html>

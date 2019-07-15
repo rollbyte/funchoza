@@ -1,0 +1,8 @@
+setup:
+  composer:
+    action: "update"
+test:
+  php_unit:
+    config: phpunit.xml
+    directory: tests
+    allow_failures: false

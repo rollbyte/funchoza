@@ -3,3 +3,8 @@
 /.project
 /.settings
 /.externalToolBuilders
+/vendor/
+/composer.lock
+/build.properties
+/components/
+/.buildpath

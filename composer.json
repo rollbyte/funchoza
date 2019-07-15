@@ -1,0 +1,25 @@
+{
+	"name" : "rollbyte/funchoza",
+	"type" : "component",
+	"preferred-install" : "dist",
+	"require-dev" : {
+		"tedivm/jshrink" : "~1.0",
+		"phpunit/phpunit" : "~7",
+		"facebook/webdriver" : "~1.6",
+		"components/jquery" : "~3.3"
+	},
+	"require" : {
+		"robloach/component-installer" : "~0.2",
+		"phing/phing" : "~2.16"
+	},
+	"extra" : {
+		"component" : {
+			"scripts" : [
+				"caviar.js"
+			],
+			"files" : [
+				"caviar.min.js"
+			]
+		}
+	}
+}

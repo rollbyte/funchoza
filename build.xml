@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="caviar" default="install">
+	<property file="build.properties" />
+	<target name="minify-js">
+		<jsMin targetDir="." suffix=".min" failOnError="false">
+  			<fileset dir=".">
+    			<include name="funchoza.js"/>
+  			</fileset>
+		</jsMin>	
+	</target>
+	<target name="install">
+		<phingcall target="minify-js" />
+	</target>
+</project>

@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Funchoza test</title>
+<style>
+.someClass {
+	border: 1px solid silver;
+	display: inline-block;
+	padding: 5px;
+}
+
+.current {
+	background-color: navy;
+	color: white;
+}
+
+.item {
+	cursor: pointer;
+	padding: 4px;
+	border-bottom: solid 1px silver;
+}
+
+.done {
+	text-decoration: line-through;
+}
+
+.subs {
+	margin-left: 15px;
+}
+</style>
+</head>
+<body>
+	<script type="text/javascript" src="../components/jquery/jquery.min.js"></script>
+	<script type="text/javascript" src="../funchoza.js"></script>
+	<script type="text/javascript">
+		var ITEM_COUNTER = 1;
+	
+		function Item(text) {
+			var id = 'item_' + ITEM_COUNTER;
+			ITEM_COUNTER++;
+			var _text = text;
+			var done = false;
+			
+			this.id = function () {return id;};
+			this.text = function (t) {if (typeof t == 'undefined') return _text; _text = t;};
+			this.selected = false;
+			
+			this.parent = null;
+			this.subs = [];
+			
+			this.addChild = function (child) {
+				child.parent = this;
+				this.subs.push(child);
+			};
+			
+			this.isDone = function () {
+				return done;
+			};
+			
+			this.done = function (el, e) {
+				done = true;
+				e.preventDefault();
+			};
+			
+			this.remove = function (item) {
+				if (item.parent === this) {
+					this.subs.splice(this.subs.indexOf(item), 1);
+					item.parent = null;					
+				}
+ 			}
+		}
+	
+		var model = {
+			someText: 'some meaningless text',
+			someMarkup: '<div id="markup_test"><span>Show the markup!!!</span></div>',
+			nested: {
+				textVal: 'val 2',
+				boolVal: false
+			},
+			stylesNattrs: {
+				color: 'red',
+				hasSomeClass: true,
+				link: 'http://www.google.com',
+				textColor: function () {
+					return this.color != 'white' ? 'white' : 'black';
+				}
+			},
+			predicatesTest: {
+				a: 2,
+				b: 2,
+				c: 8,
+				d: 3,
+				e: 6,
+				f: 100,
+				g: 50,
+				power: function (a, b) {
+					return a ** b;
+				}
+			},
+			
+			list: [],
+			
+			newItem: new Item('new task'),
+			
+			current: null,
+			
+			add: function () {
+				if (this.current) {
+					this.current.addChild(this.newItem);
+				} else {
+					this.list.push(this.newItem);
+				}
+				this.newItem = new Item('new task');
+			},
+			
+			select: function (item) {
+				if (this.current === item) {
+					this.current.selected = false;
+					this.current = null;
+				} else {
+					if (this.current) {
+						this.current.selected = false;
+					}
+					this.current = item;
+					this.current.selected = true;
+				}
+			},
+			
+			remove: function (item) {
+				this.list.splice(this.list.indexOf(item), 1);
+			}
+		}
+		
+		var model2 = {
+			actions: {
+				override1: function () {
+					model2.data = fz.replace({text: 'Oooops!'}, model2.data);
+					fz.redraw(model2.data);
+				},
+				override2: function () {
+					model2.data = fz.replace({text: 'Woow!'}, model2.data);
+					fz.redrawElement($('#deferred_text'));
+				},
+				currentModel: function () {
+					return JSON.stringify(fz.elementScope($('#deferred_text')));
+				}
+			},
+			beforeRedraw: 0,
+			afterRedraw: 0
+		};
+	</script>
+	<div fz-scope="model">
+		<div>
+			<input id="bind_checker_1" type="text" fz-get="someText" />
+			<input id="bind_checker_2" type="text" fz-data="someText" />
+			<input id="bind_checker_3" type="text" fz-set="someText" />
+		</div>
+		<div fz-html="someMarkup">
+		</div>
+		<div>
+			<label><input id="input_checker_checkbox" type="checkbox" fz-data="nested.boolVal" /></label>
+			<label><input id="input_checker_text" type="text" fz-data="nested.textVal" /></label>
+			<label><textarea id="input_checker_textarea" fz-data="nested.textVal"></textarea></label>
+			<label>
+				<select id="input_checker_select" fz-data="nested.textVal">
+					<option value="val 1">1</option>
+					<option value="val 2">2</option>
+					<option value="val 3">3</option>
+					<option value="val 4">4</option>
+				</select>
+			</label>
+			<label>
+				<input id="input_checker_radio_1" type="radio" fz-data="nested.textVal" name="radio1" value="val 1" />
+				<input id="input_checker_radio_2" type="radio" fz-data="nested.textVal" name="radio1" value="val 2" />
+				<input id="input_checker_radio_3" type="radio" fz-data="nested.textVal" name="radio1" value="val 3" />
+			</label>
+		</div>
+		<div id="checkbox_checker" fz-if="nested.boolVal">I'm displayed!!!</div>
+		<div fz-scope="stylesNattrs">
+			<a id="styles_class_checker" fz-style="backgroundColor:color;color:textColor" fz-classes="someClass:hasSomeClass" fz-attrs="href:link" fz-get="link"></a>
+			<select id="bg_color_selector" fz-data="color">
+				<option value="red">Red</option>
+				<option value="black">Black</option>
+				<option value="white">White</option>
+			</select>
+			<input type="checkbox" id="some_class_setter" fz-data="hasSomeClass" />
+			<input type="text" id="link_setter" fz-data="link" />
+		</div>
+		<div fz-scope="predicatesTest">
+			<input type="number" id="input_a" fz-data="a" />
+			<input type="number" id="input_b" fz-data="b" />
+			<input type="number" id="input_c" fz-data="c" />
+			<input type="number" id="input_d" fz-data="d" />
+			<input type="number" id="input_e" fz-data="e" />
+			<input type="text" id="input_f" fz-data="f" />
+			<input type="text" id="input_g" fz-data="g" />
+			
+			<div id="calc_1" fz-get="if(or(and(eq(a,b),neq(b,c)),lt(c,d),gt(a,d)), add(a,power(e,a),c), concat(f, ':', g))"></div>
+			<div id="calc_2" fz-data="if(and(or(neq(a,b),eq(b,c)),lte(d,c),gte(d,e)), sub(power(e,a),a,c), add(b,c,d))"></div>
+			<div id="calc_3" fz-html="if(and(is(f,'number'),is(g,'number')), add(f,g), concat(f,'.',g))"></div>
+			<div id="calc_4" fz-data="if(not(and(is(f,'number'),is(g,'number'))), concat(f,'.',g), add(f,g))"></div>
+		</div>
+		<div id="list_check">
+			<div>
+				<input id="new_item_text" type="text" fz-data="newItem.text" />
+				<button id="add_new_item" fz-handlers="click:add">Add</button>
+			</div>
+			<div id="item_tree" fz-foreach="list" fz-watch-children="true">
+				<div fz-tpl="itemTpl" fz-watch-children="true"></div>
+			</div>
+		</div>
+	</div>
+	<template id="itemTpl">
+	<div fz-attrs="id:id">
+		<div class="item" fz-handlers="click:$.model.select(@scope)" fz-classes="current:selected">
+			<span fz-data="text" fz-classes="done:isDone"></span>
+			<button class="don" fz-if="not(isDone)" fz-handlers="click:done()">Done</button>
+			<button class="del" fz-if="isDone" fz-handlers="click:^.^.remove(@scope)">Delete</button>
+		</div>
+		<div fz-foreach="subs" fz-watch-children="true" class="subs">
+			<div fz-tpl="itemTpl" fz-watch-children="true"></div>
+		</div>
+	</div>
+	</template>
+	<div id="model2_view" fz-scope="model2">
+		<div fz-scope="actions">
+			<button id="override_member_1" fz-handlers="click:override1">Override</button>
+			<button id="override_member_2" fz-handlers="click:override2">Override2</button>
+			<div id="deferred_model" fz-data="currentModel"></div>
+		</div>
+		<div id="event_counters"><span id="before_counter" fz-data="beforeRedraw"></span>&nbsp;<span id="after_counter" fz-data="afterRedraw"></span></div>
+	</div>
+	<script type="text/javascript">
+		fz.launch('model2', function () {
+			let d = $.Deferred();
+			setTimeout(function () {
+				model2.data = {text: 'Yo!!!'};
+				d.resolve();
+			}, 500);
+			return d.promise();
+		});
+		
+		$(function () {
+			setTimeout(function () {
+				$('#model2_view').prepend('<div id="deferred_bind" fz-scope="data"><span id="deferred_text" fz-data="text"></span></div>');
+				fz.bind($('#deferred_bind'), 'model2');
+				$('#deferred_text')
+					.on('beforeRedraw.funchoza', function () {model2.beforeRedraw++;fz.redrawElement($('#before_counter'));})
+					.on('afterRedraw.funchoza', function () {model2.afterRedraw++;fz.redrawElement($('#after_counter'));});
+				fz.redraw(model2.data);
+			}, 1000);
+		});
+	</script>
+</body>
+</html>
