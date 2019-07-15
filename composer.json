@@ -15,11 +15,12 @@
 	"extra" : {
 		"component" : {
 			"scripts" : [
-				"caviar.js"
+				"funchoza.js"
 			],
 			"files" : [
-				"caviar.min.js"
+				"funchoza.min.js"
 			]
 		}
-	}
+	},
+	"minimum-stability" : "dev"
 }
