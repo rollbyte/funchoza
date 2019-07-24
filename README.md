@@ -1,4 +1,4 @@
-# Funchoza.js
+# [Funchoza.js](https://www.funchoza.dev)
 lightweight javascript MVVM framework
 
 ## Overview
