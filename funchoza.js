@@ -101,20 +101,13 @@
 		}
 
 		try {
-			if (
-				evaluate(
-					event.data.scope,
-					event.data.handler,
-					$(this),
-					event,
-					function() {
-						event.data.scope.redraw();
-					},
-					args.length ? args : undefined
-				) !== false
-			) {
-				event.data.scope.redraw();
-			}
+			evaluate(
+				event.data.scope,
+				event.data.handler,
+				$(this),
+				event,
+				args.length ? args : undefined
+			);
 		} catch (err) {
 			console.error(err);
 		}
@@ -214,8 +207,31 @@
 		}
 		return [ root, property ];
 	};
+	
+	function redrawModel(model, exclude, options, debug) {
+		try {
+			if (model) {
+				if ('undefined' != typeof model.__fzUniqueId) {
+					for (let pth in scopesByModel[model.__fzUniqueId()]) {
+						if (scopesByModel[model.__fzUniqueId()].hasOwnProperty(pth)) {
+							scopesByModel[model.__fzUniqueId()][pth].redraw(options, exclude);
+						}
+					}
+				} else if (debug) {
+					console.error(
+						'Funchoza:' + model.constructor.name +
+						' can not be redrawn because it was not binded yet!'
+					);
+				}
+			} else {
+				rootScope.redraw(options);
+			}
+		} catch (err) {
+			console.error(err);
+		}
+	}	
 
-	function evaluate(scope, property, domelement, event, callback, sargs) {
+	function evaluate(scope, property, domelement, event, sargs) {
 		if (property == '@path') {
 			return scope.path;
 		}
@@ -249,7 +265,8 @@
 		}
 
 		let prop = resolveProperty(scope, property);
-		let m = prop[0].getModel(true);
+		let actScope = prop[0];
+		let m = actScope.getModel(true);
 		property = prop[1];
 		let args;
 		if (property.indexOf('(') > -1) {
@@ -278,25 +295,34 @@
 					')' + ((prop[0] === scope) ? scope.path : 'window') +
 					'->' + property
 				);
-			}			
+			}
 
 			while ('function' == typeof value) {
 				if ('undefined' == typeof args)
 					args = [];
 
-				if ('undefined' != typeof sargs)
+				if (sargs)
 					args = args.concat(sargs);
 
-				if ('undefined' != typeof domelement)
+				if (domelement)
 					args.push(domelement);
 
-				if ('undefined' != typeof event)
+				if (event)
 					args.push(event);
 
-				if ('undefined' != typeof callback)
-					args.push(callback);
 				value = value.apply(m, args);
 				args = [];
+			}
+			
+			if (event && (value !== false)) {
+				$.when(value).done(function () {
+					let sm = scope.getModel(true);
+					if ((sm !== m) && m)
+						redrawModel(m, scope);
+					if (sm) {
+						redrawModel(sm);
+					}
+				});		
 			}
 			return value;
 		}
@@ -1109,7 +1135,7 @@
 					(scope.children[i].reactOnParent === true || options.branch || scope.colScope) &&
 					(scope.children[i] !== excludeChild)
 				) {
-					redraw(scope.children[i], null, {parent: false, children: true, branch: options.branch});
+					redraw(scope.children[i], excludeChild, {parent: false, children: true, branch: options.branch});
 				}
 			}
 		}
@@ -1212,9 +1238,10 @@
 		 * @param {Boolean} [options.branch]
 		 * @param {Boolean} [options.parent]
 		 * @param {Boolean} [options.toRoot]
+		 * @param {fzScope} [exclude]
 		 */
-		this.redraw = function(options) {
-			redraw(this, null, options || {});
+		this.redraw = function(options, exclude) {
+			redraw(this, exclude || null, options || {});
 		};
 	}
 	
@@ -1261,28 +1288,7 @@
 		},
 
 		redraw: function (model, options) {
-			try {
-				if (model) {
-					if ('undefined' != typeof model.__fzUniqueId) {
-						for (let pth in scopesByModel[model.__fzUniqueId()]) {
-							if (scopesByModel[model.__fzUniqueId()].hasOwnProperty(pth)) {
-								scopesByModel[model.__fzUniqueId()][pth].redraw(options);
-							}
-						}
-					} else {
-						if (debugMode) {
-							console.error(
-								'Funchoza:' + model.constructor.name +
-								' can not be redrawn because it was not binded yet!'
-							);
-						}
-					}
-				} else {
-					rootScope.redraw(options);
-				}
-			} catch (err) {
-				console.error(err);
-			}
+			redrawModel(model, null, options, debugMode);
 		},
 
 		launch: function (path, launcher) {

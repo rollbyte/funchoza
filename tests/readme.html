@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>Insert title here</title>
+	<script type="text/javascript" src="../components/jquery/jquery.min.js"></script>
+	<script type="text/javascript" src="../funchoza.js"></script>
+	<style>
+  		#ball {
+    		position: absolute;
+    		width: 100px;
+    		height: 100px;
+    		background-color: green;
+  		}
+	</style>	
+</head>
+<body>
+<script>
+	var myApp = {
+		  prop: 'some text',
+		  info: function () {
+		    return 'Member position is [' + this.member1.x + ', ' + this.member1.y + ']';
+		  },
+		  member1: {
+		    x: 200,
+		    y: 400,
+		    go: function () {
+		      this.x += 100;
+		    }    
+		  }
+	};
+</script>
+<div fz-scope="myApp" fz-watch-children="true">
+  <div fz-data="prop"></div>
+  <div fz-data="info"></div>
+  <scope fz-scope="member1">
+  	<button type="button" fz-handlers="click:go">GO!</button>
+    <div id="ball" fz-style="left:x;top:y">Let's go!</div>
+  </scope>
+</div>
+</body>
+</html>

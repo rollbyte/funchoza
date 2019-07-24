@@ -264,6 +264,7 @@ class BasicTest extends TestCase {
         $model = self::$wd->findElement(WebDriverBy::id('deferred_model'));
         $obj = json_decode($model->getText());
         $this->assertEquals('Woow!', $obj->text, 'elementScope call test failed');
+        
         $before_counter = self::$wd->findElement(WebDriverBy::id('before_counter'));
         $after_counter = self::$wd->findElement(WebDriverBy::id('after_counter'));
         $this->assertEquals('3', $before_counter->getText(), 'beforeRedraw event handling test failed');

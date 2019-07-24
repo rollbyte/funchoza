@@ -206,8 +206,8 @@
 				<input id="new_item_text" type="text" fz-data="newItem.text" />
 				<button id="add_new_item" fz-handlers="click:add">Add</button>
 			</div>
-			<div id="item_tree" fz-foreach="list" fz-watch-children="true">
-				<div fz-tpl="itemTpl" fz-watch-children="true"></div>
+			<div id="item_tree" fz-foreach="list">
+				<div fz-tpl="itemTpl"></div>
 			</div>
 		</div>
 	</div>
@@ -218,8 +218,8 @@
 			<button class="don" fz-if="not(isDone)" fz-handlers="click:done()">Done</button>
 			<button class="del" fz-if="isDone" fz-handlers="click:^.^.remove(@scope)">Delete</button>
 		</div>
-		<div fz-foreach="subs" fz-watch-children="true" class="subs">
-			<div fz-tpl="itemTpl" fz-watch-children="true"></div>
+		<div fz-foreach="subs" class="subs">
+			<div fz-tpl="itemTpl"></div>
 		</div>
 	</div>
 	</template>
