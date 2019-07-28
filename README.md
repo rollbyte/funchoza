@@ -29,28 +29,16 @@ Define a model in javascript
 Bind DOM-elements to model properties and functions
 
 ```html
-<html>
-<head>
-<style>
-  #ball {
-    position: absolute;
-    width: 100px;
-    height: 100px;
-    background-color: green;
-  }
-</style>
-</head>
 <body>
-<div fz-scope="myApp" fz-watch-children="true">
-  <div fz-data="prop"></div>
-  <div fz-data="info"></div>
-  <scope fz-scope="member1">
-    <button type="button" fz-handlers="click:go">GO!</button>
-    <div id="ball" fz-style="left:x;top:y">Let's go!</div>
-  </scope>
-</div>
+	<div fz-scope="myApp" fz-watch-children="true">
+		<div fz-data="prop"></div>
+		<div fz-data="info"></div>
+		<scope fz-scope="member1">
+			<button type="button" fz-handlers="click:go">GO!</button>
+			<div id="ball" fz-style="left:x;top:y">Let's go!</div>
+		</scope>
+	</div>
 </body>
-</html>
 ```
 
 Open page, click on **GO!** button, watch how page changes.

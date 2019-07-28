@@ -276,9 +276,9 @@
 			property = property.substring(0, property.indexOf('('));
 			if (
 				(args.length > 0) &&
-				('undefined' != typeof Funchoza.predicates[property.trim()])
+				('undefined' != typeof Funchoza.funclib[property.trim()])
 			)
-				return Funchoza.predicates[property.trim()].apply(null, args);
+				return Funchoza.funclib[property.trim()].apply(null, args);
 		}
 
 		if (('undefined' != typeof m) && (m != null)) {
@@ -1317,7 +1317,7 @@
 			return what;
 		},
 		
-		predicates: {
+		funclib: {
 			not : function(v) {
 				return !v;
 			},
