@@ -211,9 +211,10 @@
 	function redrawModel(model, exclude, options, debug) {
 		try {
 			if (model) {
+				exclude = exclude || {};
 				if ('undefined' != typeof model.__fzUniqueId) {
 					for (let pth in scopesByModel[model.__fzUniqueId()]) {
-						if (scopesByModel[model.__fzUniqueId()].hasOwnProperty(pth)) {
+						if (!exclude[pth] && scopesByModel[model.__fzUniqueId()].hasOwnProperty(pth)) {
 							scopesByModel[model.__fzUniqueId()][pth].redraw(options, exclude);
 						}
 					}
@@ -318,7 +319,7 @@
 				$.when(value).done(function () {
 					let sm = scope.getModel(true);
 					if ((sm !== m) && m)
-						redrawModel(m, scope);
+						redrawModel(m, {[scope.path]: true});
 					if (sm) {
 						redrawModel(sm);
 					}
@@ -507,11 +508,11 @@
 			let react_parent, react_child;
 			
 			if ('undefined' != typeof me.attr('fz-watch-parent')) {
-				react_parent = Boolean(me.attr('fz-watch-parent'));
+				react_parent = me.attr('fz-watch-parent') == 'true';
 			}
 
 			if ('undefined' != typeof me.attr('fz-watch-children')) {
-				react_child = Boolean(me.attr('fz-watch-children'));
+				react_child = me.attr('fz-watch-children') == 'true';
 			}
 
 			if ('undefined' != typeof me.attr('fz-scope')) {
@@ -1103,14 +1104,14 @@
 	
 	/**
 	 * @param {fzScope} scope
-	 * @param {fzScope | null} [excludeChild]
+	 * @param {{}} [exclude]
 	 * @param {{}} [options]
 	 * @param {Boolean} [options.children]
 	 * @param {Boolean} [options.branch]
 	 * @param {Boolean} [options.parent]
 	 * @param {Boolean} [options.toRoot]
 	 */
-	function redraw(scope, excludeChild, options) {
+	function redraw(scope, exclude, options) {
 		options = options || {};
 		if (options.children === undefined) {
 			options.children = true;
@@ -1125,17 +1126,24 @@
 		for (let i = 0; i < scope.bindings.length; i++) {
 			scope.bindings[i].redraw();
 		}
-		if (scope.parent != null && (options.parent && scope.parent.reactOnChildren === true || options.toRoot)) {
-			redraw(scope.parent, scope, {toRoot: options.toRoot});
+		
+		exclude = exclude || {};
+		exclude[scope.path] = true;
+		
+		if (scope.parent != null &&
+			(options.parent && scope.parent.reactOnChildren === true || options.toRoot) &&
+			!exclude[scope.parent.path]
+		) {
+			redrawModel(scope.parent.getModel(), exclude, {toRoot: options.toRoot});
 		}
 		
 		if (options.children || options.branch) {
 			for (let i = 0; i < scope.children.length; i++) {
 				if (
 					(scope.children[i].reactOnParent === true || options.branch || scope.colScope) &&
-					(scope.children[i] !== excludeChild)
+					(!exclude[scope.children[i].path])
 				) {
-					redraw(scope.children[i], excludeChild, {parent: false, children: true, branch: options.branch});
+					redrawModel(scope.children[i].getModel(), exclude, {parent: false, children: true, branch: options.branch});
 				}
 			}
 		}
