@@ -224,8 +224,6 @@
 						' can not be redrawn because it was not binded yet!'
 					);
 				}
-			} else {
-				rootScope.redraw(options);
 			}
 		} catch (err) {
 			console.error(err);
@@ -1141,7 +1139,7 @@
 			for (let i = 0; i < scope.children.length; i++) {
 				if (
 					(scope.children[i].reactOnParent === true || options.branch || scope.colScope) &&
-					(!exclude[scope.children[i].path])
+					!exclude[scope.children[i].path]
 				) {
 					redrawModel(scope.children[i].getModel(), exclude, {parent: false, children: true, branch: options.branch});
 				}
@@ -1207,7 +1205,7 @@
 
 			if (this.model && 'undefined' == typeof this.model.__fzUniqueId) {
 				this.model.__fzUniqueId = (function() {
-					if (undefined == this.__fz__uid) {
+					if ('undefined' == typeof this.__fz__uid) {
 						this.__fz__uid = FZ_GLOBAL_OBJECT_ID;
 						FZ_GLOBAL_OBJECT_ID++;
 					}
@@ -1296,7 +1294,11 @@
 		},
 
 		redraw: function (model, options) {
-			redrawModel(model, null, options, debugMode);
+			if (model) {
+				redrawModel(model, null, options, debugMode);
+			} else {
+				redraw(rootScope, null, options);
+			}
 		},
 
 		launch: function (path, launcher) {
