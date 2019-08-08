@@ -30,33 +30,33 @@ class BasicTest extends TestCase {
         $bc3 = self::$wd->findElement(WebDriverBy::id('bind_checker_3'));
 
         $markup = self::$wd->findElement(WebDriverBy::id('markup_test'));
-        $this->assertNotEmpty($markup, 'cvr-html binding test failed');
+        $this->assertNotEmpty($markup, 'fz-html binding test failed');
         
-        $this->assertEquals('some meaningless text', $bc1->getAttribute('value'), 'cvr-get binding read check test failed');
-        $this->assertEquals('some meaningless text', $bc2->getAttribute('value'), 'cvr-data binding read check test failed');
-        $this->assertEmpty($bc3->getAttribute('value'), 'cvr-set binding read check test failed');
+        $this->assertEquals('some meaningless text', $bc1->getAttribute('value'), 'fz-get binding read check test failed');
+        $this->assertEquals('some meaningless text', $bc2->getAttribute('value'), 'fz-data binding read check test failed');
+        $this->assertEmpty($bc3->getAttribute('value'), 'fz-set binding read check test failed');
         $bc2->click();
         $bc2->clear();
         $bc2->sendKeys("test test test\n");
-        $this->assertEquals($bc2->getAttribute('value'), $bc1->getAttribute('value'), 'cvr-data binding test failed');
+        $this->assertEquals($bc2->getAttribute('value'), $bc1->getAttribute('value'), 'fz-data binding test failed');
         $bc3->click();
         $bc3->clear();
         $bc3->sendKeys("second test text\n");
-        $this->assertEquals($bc2->getAttribute('value'), $bc3->getAttribute('value'), 'cvr-set binding write check test failed');
-        $this->assertEquals($bc1->getAttribute('value'), $bc3->getAttribute('value'), 'cvr-set binding write check test failed');
+        $this->assertEquals($bc2->getAttribute('value'), $bc3->getAttribute('value'), 'fz-set binding write check test failed');
+        $this->assertEquals($bc1->getAttribute('value'), $bc3->getAttribute('value'), 'fz-set binding write check test failed');
     }
     
     public function testEditorTypes(): void
     {
         $cbck = self::$wd->findElement(WebDriverBy::id('checkbox_checker'));
         $this->assertEquals(false, $cbck->getAttribute('checked'), 'checkbox read binding test failed');
-        $this->assertEquals('none', $cbck->getCSSValue('display'), 'negative cvr-if binding test failed');
+        $this->assertEquals('none', $cbck->getCSSValue('display'), 'negative fz-if binding test failed');
         
         $cb = self::$wd->findElement(WebDriverBy::id('input_checker_checkbox'));
         $cb->click();
         $check = self::$wd->executeScript('return model.nested.boolVal');
         $this->assertTrue($check, 'checkbox write binding test failed');
-        $this->assertEquals('block', $cbck->getCSSValue('display'), 'positive cvr-if binding test failed');
+        $this->assertEquals('block', $cbck->getCSSValue('display'), 'positive fz-if binding test failed');
         
         $text = self::$wd->findElement(WebDriverBy::id('input_checker_text'));
         $textarea = self::$wd->findElement(WebDriverBy::id('input_checker_textarea'));
@@ -202,7 +202,7 @@ class BasicTest extends TestCase {
         
         $itemTree = self::$wd->findElement(WebDriverBy::id('item_tree'));
         $items = $itemTree->findElements(WebDriverBy::cssSelector('.item'));
-        $this->assertEquals(3, count($items), 'cvr-foreach and cvr-tpl test failed');
+        $this->assertEquals(3, count($items), 'fz-foreach and fz-tpl test failed');
         
         $second_item = self::$wd->findElement(WebDriverBy::id('item_2'));
         $second_item->click();
@@ -233,16 +233,16 @@ class BasicTest extends TestCase {
 
         $first_item_title = $first_item->findElement(WebDriverBy::cssSelector('.item'));
         $this->assertEquals('rgba(0, 0, 128, 1)', $first_item_title->getCSSValue('background-color'), 'select first item check failed');
-        $this->assertEquals('rgba(0, 0, 0, 0)', $fifth_item_title->getCSSValue('background-color'), 'cvr-watch-parent check failed');
+        $this->assertEquals('rgba(0, 0, 0, 0)', $fifth_item_title->getCSSValue('background-color'), 'fz-watch-parent check failed');
         
         $fifth_item->click();
-        $this->assertEquals('rgba(0, 0, 0, 0)', $first_item_title->getCSSValue('background-color'), 'cvr-watch-children check failed');
+        $this->assertEquals('rgba(0, 0, 0, 0)', $first_item_title->getCSSValue('background-color'), 'fz-watch-children check failed');
         
         
         $done_button = $fifth_item_title->findElement(WebDriverBy::cssSelector('button.don'));
-        $this->assertTrue($done_button->isDisplayed(), 'cvr-if by formula check failed');
+        $this->assertTrue($done_button->isDisplayed(), 'fz-if by formula check failed');
         $done_button->click();
-        $this->assertFalse($done_button->isDisplayed(), 'cvr-if by formula second check failed');
+        $this->assertFalse($done_button->isDisplayed(), 'fz-if by formula second check failed');
         $del_button = $fifth_item_title->findElement(WebDriverBy::cssSelector('button.del'));
         $del_button->click();
         
