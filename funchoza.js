@@ -1137,7 +1137,8 @@
 			(options.parent && scope.parent.reactOnChildren === true || options.toRoot) &&
 			!exclude[scope.parent.path]
 		) {
-			redrawModel(scope.parent.getModel(!scope.parent.getModel()), exclude, {toRoot: options.toRoot});
+			let m = scope.parent.getModel();
+			redrawModel(scope.parent.getModel(!(m && m.___fzUniqueId)), exclude, {toRoot: options.toRoot});
 		}
 		
 		if (options.children || options.branch) {
@@ -1146,7 +1147,8 @@
 					(scope.children[i].reactOnParent === true || options.branch || scope.colScope) &&
 					!exclude[scope.children[i].path]
 				) {
-					redrawModel(scope.children[i].getModel(!scope.children[i].getModel()), exclude, {parent: false, children: true, branch: options.branch});
+					let m = scope.children[i].getModel();
+					redrawModel(scope.children[i].getModel(!(m && m.___fzUniqueId)), exclude, {parent: false, children: true, branch: options.branch});
 				}
 			}
 		}
