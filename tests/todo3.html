@@ -118,9 +118,9 @@
 		};
 	</script>
 	<div fz-scope="todo">
-		<div>
-			<input type="text" fz-data="newTask.text" />
-			<button fz-handlers="click:addTask">Add</button>
+		<div fz-scope="newTask">
+			<input type="text" fz-data="text" />
+			<button fz-handlers="click:^.addTask">Add</button>
 		</div>
 		<div>
 			You have <span fz-data="tasksCount"></span> tasks
