@@ -1190,7 +1190,7 @@
 					return m;
 				}
 
-				if (('object' != typeof m) && ('array' != typeof m)) {
+				if ('object' != typeof m) {
 					throw new Error('can not use scalar value "' + m + '" as model for path ' + this.path);
 				}
 
