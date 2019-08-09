@@ -216,11 +216,7 @@
 					for (let pth in scopesByModel[model.__fzUniqueId()]) {
 						if (!exclude[pth] && scopesByModel[model.__fzUniqueId()].hasOwnProperty(pth)) {
 							let scope = scopesByModel[model.__fzUniqueId()][pth];
-							if (scope.getModel(true) === model) { 
-								scope.redraw(options, exclude);
-							} else {
-								delete scopesByModel[model.__fzUniqueId()][pth];
-							}
+							scope.redraw(options, exclude);
 						}
 					}
 				} else if (debug) {
@@ -1193,39 +1189,41 @@
 				if ('object' != typeof m) {
 					throw new Error('can not use scalar value "' + m + '" as model for path ' + this.path);
 				}
+				
+				if (m && ('undefined' == typeof m.__fzUniqueId)) {
+					m.__fzUniqueId = (function() {
+						if ('undefined' == typeof this.__fz__uid) {
+							this.__fz__uid = FZ_GLOBAL_OBJECT_ID;
+							FZ_GLOBAL_OBJECT_ID++;
+						}
+						return this.__fz__uid;
+					}).bind(m);					
+				}
 
-				if (m && this.model && forceReload && (this.model !== m)) {
-					if (('undefined' != typeof this.model.__fzUniqueId) && ('undefined' == typeof m.__fzUniqueId)) {
-						if ('undefined' == typeof m.__fzUniqueId) {
-							m.__fzUniqueId = this.model.__fzUniqueId;
-							m.__fz__uid = this.model.__fz__uid;
-						} else {
-							if (typeof scopesByModel[this.model.__fzUniqueId()] == 'undefined') {
-								delete scopesByModel[this.model.__fzUniqueId()][this.path];
+				if (this.model && this.model !== m) {
+					if (typeof scopesByModel[this.model.__fzUniqueId()] !== 'undefined') {
+						delete scopesByModel[this.model.__fzUniqueId()][this.path];
+						let empty = true;
+						for (let pth in scopesByModel[this.model.__fzUniqueId()]) {
+							if (scopesByModel[this.model.__fzUniqueId()].hasOwnProperty(pth)) {
+								empty = false;
+								break;
 							}
+						}
+						if (empty) {
+							delete scopesByModel[this.model.__fzUniqueId()];
 						}
 					}
 				}
 
 				this.model = m;
-			}
-
-			if (this.model && 'undefined' == typeof this.model.__fzUniqueId) {
-				this.model.__fzUniqueId = (function() {
-					if ('undefined' == typeof this.__fz__uid) {
-						this.__fz__uid = FZ_GLOBAL_OBJECT_ID;
-						FZ_GLOBAL_OBJECT_ID++;
+				
+				if (this.model) {
+					if (typeof scopesByModel[this.model.__fzUniqueId()] == 'undefined') {
+						scopesByModel[this.model.__fzUniqueId()] = {};
 					}
-					return this.__fz__uid;
-				}).bind(this.model);
-				init = true;
-			}
-
-			if ((init || forceReload) && this.model) {
-				if (typeof scopesByModel[this.model.__fzUniqueId()] == 'undefined') {
-					scopesByModel[this.model.__fzUniqueId()] = {};
+					scopesByModel[this.model.__fzUniqueId()][this.path] = this;
 				}
-				scopesByModel[this.model.__fzUniqueId()][this.path] = this;
 			}
 
 			return this.model;
@@ -1324,14 +1322,6 @@
 				return bindings[e.attr('fz-bid')].scope.getModel();
 			}
 			return null;
-		},
-
-		replace: function (what, by) {
-			if (by && by.__fzUniqueId) {
-				what.__fzUniqueId = by.__fzUniqueId;
-				what.__fz__uid = by.__fz__uid;
-			}
-			return what;
 		},
 		
 		funclib: {

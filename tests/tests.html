@@ -135,11 +135,12 @@
 		var model2 = {
 			actions: {
 				override1: function () {
-					model2.data = fz.replace({text: 'Oooops!'}, model2.data);
-					fz.redraw(model2.data);
+					let old = model2.data;
+					model2.data = {text: 'Oooops!'};
+					fz.redraw(old);
 				},
 				override2: function () {
-					model2.data = fz.replace({text: 'Woow!'}, model2.data);
+					model2.data = {text: 'Woow!'};
 					fz.redrawElement($('#deferred_text'));
 				},
 				currentModel: function () {
