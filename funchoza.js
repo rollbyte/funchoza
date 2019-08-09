@@ -432,7 +432,8 @@
 				path,
 				parentScope,
 				srcScope.reactOnParent,
-				srcScope.reactOnChildren
+				srcScope.reactOnChildren,
+				element
 			);
 			scopesByPath[path] = root;
 			parentScope.addChild(root);
@@ -565,7 +566,8 @@
 							pth,
 							ps,
 							('undefined' != typeof react_parent && i == scope_path.length - 1) ? react_parent : true,
-							('undefined' != typeof react_child && i == scope_path.length - 1) ? react_child : false
+							('undefined' != typeof react_child && i == scope_path.length - 1) ? react_child : false,
+							this
 						);
 						ps.addChild(s);
 						scopesByPath[pth] = s;
@@ -785,7 +787,8 @@
 								fepath,
 								ps,
 								('undefined' != typeof react_parent) ? react_parent : true,
-								('undefined' != typeof react_child) ? react_child : false
+								('undefined' != typeof react_child) ? react_child : false,
+								this
 						);
 						colScope.colScope = true;
 						ps.addChild(colScope);
@@ -840,7 +843,8 @@
 						scopePath,
 						parentScope,
 						(rp !== undefined) ? rp : true,
-						(rc !== undefined) ? rc : false
+						(rc !== undefined) ? rc : false,
+						element
 				);
 				
 				scopesByPath[scopePath] = root;
@@ -1150,7 +1154,7 @@
 		}
 	}
 
-	function fzScope(path, parent, react_parent, react_children) {
+	function fzScope(path, parent, react_parent, react_children, el) {
 		this.parent = parent;
 		this.reactOnParent = react_parent;
 		this.reactOnChildren = react_children;
@@ -1158,6 +1162,7 @@
 		this.children = [];
 		this.bindings = [];
 		this.path = path;
+		this.element = el;
 
 		/*
 		 * Вычисление объекта для которого создан скоуп + размещение ссылки на
@@ -1252,7 +1257,9 @@
 		 * @param {fzScope} [exclude]
 		 */
 		this.redraw = function(options, exclude) {
-			redraw(this, exclude || null, options || {});
+			if ($(this.element).closest('.fz-hidden-by-if').not(this.element).length == 0) {
+				redraw(this, exclude || null, options || {});
+			}
 		};
 	}
 	
@@ -1396,7 +1403,7 @@
 		}	
 	};
 
-	rootScope = new fzScope('', null, false, false);
+	rootScope = new fzScope('', null, false, false, document.body);
 	scopesByPath[''] = rootScope;
 	rootScope.getModel(true);
 	
