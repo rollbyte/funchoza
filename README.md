@@ -4,7 +4,7 @@ lightweight javascript MVVM framework
 ## Overview
 
 Funchoza is made with KISS principle in mind. It is focused on total separation of model and presentation layers.
-In most cases you don't need to write any specific javascript code or follow any conventions to make DOM display your model data. Implement any logic you like and bind DOM elements in markup - Funchoza will do the rest for you. It also provides a simple API to force DOM refresh from code though. The API also makes deffered binding possible.
+In most cases you don't need to write any specific javascript code or follow any conventions to make DOM display your model data. Implement any logic you like and bind DOM elements in the markup - Funchoza will do the rest for you. It also provides a simple API to force DOM updates from code though. The API also makes deffered binding possible.
 
 ## Quick start
 
@@ -41,5 +41,5 @@ Bind DOM-elements to model properties and functions
 </body>
 ```
 
-Open page, click on **GO!** button, watch how page changes.
-For detailed documentation please visit framework [site](https://www.funchoza.dev). Also you can view file _'tests/tests.html'_ and corresponding selenium-based tests in _'tests/BasicTest.php'_ which cover almost all framework features.
+Open the page, click on the **GO!** button, watch how the page changes.
+For the detailed documentation please visit the framework [site](https://www.funchoza.dev). Also you can view file _'tests/tests.html'_ and corresponding selenium-based tests in _'tests/BasicTest.php'_ which cover almost all the framework features.
